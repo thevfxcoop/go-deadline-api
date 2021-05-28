@@ -178,6 +178,32 @@ func Test_Client_012(t *testing.T) {
 	}
 }
 
+func Test_Client_013(t *testing.T) {
+	client := GetClient(t, true)
+	ids, err := client.GetJobIds()
+	if err != nil {
+		t.Error(err)
+	}
+	if len(ids) == 0 {
+		t.Skip("No jobs")
+	}
+	tasks, err := client.GetTaskIdsForJobId(ids[0])
+	if err != nil {
+		t.Error(err)
+	}
+	if len(tasks) == 0 {
+		t.Skip("No tasks")
+	}
+	if reports, err := client.GetTaskReportsForJobId(ids[0], tasks[0]); err != nil {
+		t.Error(err)
+	} else {
+		for _, report := range reports {
+			t.Logf("%+v", report)
+
+		}
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 // To run some tests, use environment variable DEADLINE_ENDPOINT

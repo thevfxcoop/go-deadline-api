@@ -227,3 +227,33 @@ ssh -i ~/.ssh/ansible.pem -L 8082:localhost:8082  ansible@linux-a.vfx.coop
     "ExtraElements": null
 }
 ```
+
+## Appendix: Task Report JSON Format
+
+```json
+{
+    "Job": "60ae9508f69eb6110034df45",
+    "Type": 1,
+    "Date": "2021-05-26T18:36:05.437+00:00",
+    "Slave": "ws-dcv-a-00",
+    "Task": 0,
+    "Title": "Error: FailRenderException : Blender render executable was not found in the semicolon separated list \"C:\\Program Files\\Blender Foundation\\Blender\\blender.exe;C:\\Program Files (x86)\\Blender Foundation\\Blender\\blender.exe;/Applications/Blender/blender.app/Contents/MacOS/blender;/usr/local/Blender/blender\". The path to the render executable can be configured from the Plugin Configuration in the Deadline Monitor.\n   at Deadline.Plugins.DeadlinePlugin.FailRender(String message) (Python.Runtime.PythonException)\n  File \"/mnt/site/config/deadline/Deadline10/workers/ws-dcv-a-00/plugins/60ae9508f69eb6110034df45/Blender.py\", line 72, in RenderExecutable\n    self.FailRender( \"Blender render executable was not found in the semicolon separated list \\\"\" + executableList + \"\\\". The path to the render executable can be configured from the Plugin Configuration in the Deadline Monitor.\" )\n   at Python.Runtime.Dispatcher.Dispatch(ArrayList args)\n   at __FranticX_GenericDelegate0`1\\[\\[System_String\\, System_Private_CoreLib\\, Version=4_0_0_0\\, Culture=neutral\\, PublicKeyToken=7cec85d7bea7798e\\]\\]Dispatcher.Invoke()\n   at FranticX.Processes.ManagedProcess.RenderExecutable()\n   at Deadline.Plugins.DeadlinePlugin.RenderExecutable()\n   at FranticX.Processes.ManagedProcess.Execute(Boolean waitForExit)\n   at Deadline.Plugins.PluginWrapper.RenderTasks(Task task, String& outMessage, AbortLevel& abortLevel)",
+    "JobName": "sample",
+    "JobUser": "djt",
+    "Plugin": "Blender",
+    "Frames": "1-1",
+    "TaskStartTime": "0001-01-01T00:00:00Z",
+    "TaskTime": 10,
+    "LogErr": "",
+    "AverageCpu": 13,
+    "PeakCpu": 20,
+    "AverageRam": 8305750528,
+    "RamAvgPer": 51,
+    "PeakRam": 8309153792,
+    "RamPeakPer": 51,
+    "UsedClock": 4018,
+    "TotalClock": 30902,
+    "_id": "60ae9515d1300e1054f5cb7d"
+}
+```
+
