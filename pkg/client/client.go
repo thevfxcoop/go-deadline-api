@@ -127,6 +127,10 @@ func (this *Client) Do(in Payload, out interface{}, opts ...RequestOpt) error {
 		return err
 	}
 
+	if debug, ok := this.Client.Transport.(*logtransport); ok {
+		debug.Payload(in)
+	}
+
 	// Parse through options
 	for _, opt := range opts {
 		if err := opt(req); err != nil {

@@ -1,88 +1,48 @@
 package client
 
 import (
-	"time"
-
 	deadline "github.com/thevfxcoop/go-deadline-api"
-)
-
-///////////////////////////////////////////////////////////////////////////////
-// SCHEMA
-
-type JobState string
-
-type Job struct {
-	Id     string `json:"_id"`
-	Plugin string `json:"Plug"`
-
-	Props struct {
-		Name       string
-		Batch      string
-		User       string
-		Region     string
-		Comment    string `json:"Cmmt"`
-		Department string `json:"Dept"`
-		Frames     string
-		Chunk      uint
-		Tasks      uint
-		Group      string `json:"Grp"`
-		Pool       string
-		SecPool    string
-		Priority   uint `json:"Pri"`
-	} `json:"Props"`
-
-	Purged          bool
-	Machine         string    `json:"Mach"`
-	SubmittedDate   time.Time `json:"Date"`
-	StartedDate     time.Time `json:"DateStart"`
-	CompletedDate   time.Time `json:"DateComp"`
-	CompletedChunks uint
-	QueuedChunks    uint
-	SuspendedChunks uint
-	RenderingChunks uint
-	FailedChunks    uint
-	PendingChunks   uint
-	Progress        string `json:"SnglTskPrg"`
-	Errors          uint   `json:"Errs"`
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// GLOBALS
-
-const (
-	JobStateActive    JobState = "Active"
-	JobStateSuspended JobState = "Suspended"
-	JobStateCompleted JobState = "Completed"
-	JobStateFailed    JobState = "Failed"
-	JobStatePending   JobState = "Pending"
+	schema "github.com/thevfxcoop/go-deadline-api/pkg/schema"
 )
 
 ///////////////////////////////////////////////////////////////////////////////
 // METHODS
 
 // GetJobs returns jobs with filters. The filters can be OptJobState(...JobState)
-func (this *Client) GetJobs(opts ...RequestOpt) ([]Job, error) {
-	var jobs []Job
+func (this *Client) GetJobs(opts ...RequestOpt) ([]*schema.Job, error) {
+	var objs []map[string]interface{}
 	payload := NewGetPayload(ContentTypeJson)
-	if err := this.Do(payload, &jobs, append(opts, OptPath("api/jobs"))...); err != nil {
+	if err := this.Do(payload, &objs, append(opts, OptPath("api/jobs"))...); err != nil {
 		return nil, err
-	} else {
-		return jobs, nil
 	}
+
+	// Convert into schema
+	jobs := make([]*schema.Job, 0, len(objs))
+	for _, obj := range objs {
+		if job, err := schema.NewJob(obj); err != nil {
+			return nil, err
+		} else {
+			jobs = append(jobs, job)
+		}
+	}
+
+	// Return success
+	return jobs, nil
 }
 
 // GetJobWithId returns a job with specific id. Returns nil if
 // job is not found
-func (this *Client) GetJobWithId(id string) (*Job, error) {
-	var jobs []Job
+func (this *Client) GetJobWithId(id string) (*schema.Job, error) {
+	var objs []map[string]interface{}
 	payload := NewGetPayload(ContentTypeJson)
-	if err := this.Do(payload, &jobs, OptPath("api/jobs"), optJobId(id)); err != nil {
+	if err := this.Do(payload, &objs, OptPath("api/jobs"), optJobId(id)); err != nil {
 		return nil, err
-	} else if len(jobs) == 0 {
+	} else if len(objs) == 0 {
 		return nil, deadline.ErrNotFound
-	} else {
-		return &jobs[0], nil
 	}
+
+	// Decode data
+	return schema.NewJob(objs[0])
 }
 
 // GetJobIds returns job identifiers

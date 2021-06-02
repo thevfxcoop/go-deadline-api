@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/thevfxcoop/go-deadline-api"
+	"github.com/thevfxcoop/go-deadline-api/pkg/schema"
 )
 
 // OptTimeout sets the timeout on any request. By default, a timeout
@@ -67,14 +68,18 @@ func OptPath(value string) RequestOpt {
 }
 
 // OptJobState(...JobState) for GetJobs request
-func OptJobState(values ...JobState) RequestOpt {
+func OptJobState(v ...schema.JobStatus) RequestOpt {
 	return func(r *http.Request) error {
-		if len(values) == 0 {
+		if len(v) == 0 {
 			return deadline.ErrBadParameter.With("OptJobState")
 		}
-		values_ := make([]string, len(values))
-		for i, value := range values {
-			values_[i] = string(value)
+		values_ := make([]string, len(v))
+		for i, value := range v {
+			if value < schema.JobStatusUnknown || value > schema.JobStatusPending {
+				return deadline.ErrBadParameter.With("OptJobState: ", v)
+			}
+			v_ := value.String()
+			values_[i] = strings.ToUpper(v_[0:0]) + v_[1:]
 		}
 		params := r.URL.Query()
 		params.Set("States", strings.Join(values_, ","))
@@ -108,6 +113,68 @@ func optTaskId(value uint) RequestOpt {
 	return func(r *http.Request) error {
 		params := r.URL.Query()
 		params.Set("TaskID", fmt.Sprint(value))
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optGroups for GetWorkersForGroup request sets comma-separated groups
+func optGroups(value []string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Group", strings.Join(value, ","))
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optPools for GetWorkersForPool request sets comma-separated groups
+func optPools(value []string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Pool", strings.Join(value, ","))
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optSlaves for RemoveWorkersFromGroup request sets comma-separated workers
+func optSlaves(value []string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Slaves", strings.Join(value, ","))
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optNameOnly for GetWorkerNames
+func optNameOnly() RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("NamesOnly", "true")
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optName for GetWorkerXX
+func optName(value []string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		if len(value) > 0 {
+			params.Set("Name", strings.Join(value, ","))
+		}
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optData for GetWorkerXX
+func optData(value string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Data", value)
 		r.URL.RawQuery = params.Encode()
 		return nil
 	}

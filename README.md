@@ -1,13 +1,77 @@
 # go-deadline-api
 
-Deadline API. Please see outline of the REST API [here](https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/index-rest-api.html). There is a lack of informaton on the schema, but it may just come straight out of MongoDB, to be determined.
+Deadline API. Please see outline of the REST API [here](https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/index-rest-api.html). There is a lack of informaton on the schema, but it may just come straight out of MongoDB, which is still to be determined.
+
+The pre-requisites for this api are:
+
+ * A working Deadline Web Service
+ * Any recent version of go
+
+## Getting Started
+
+To use this API in your own code, import it and create a client:
+
+```go
+package main
+
+import (
+	"github.com/thevfxcoop/go-deadline-api/pkg/client"
+)
+
+func main() {
+    var endpoint *url.URL
+    client, err := client.NewClient(endpoint)
+    if err != nil {
+        // ...
+    }
+    version, err := client.Ping()
+    if err != nil {
+        // ...
+    }    
+}
+```
+
+You can call the `Ping` method in order to get the Deadline version,
+or it will return an error if the repository cannot be accessed.
+
+## Schema
+
+The native deadline schema is somewhat undocumented, so the schema for the
+webservice is translated into a documented schema and available
+in `pkg/schema` for jobs, tasks, and so forth. The schema documentation is:
+
+  * Jobs
+  * Job Reports
+  * Tasks
+  * Task Reports
+
+## Jobs and Job Reports
+
+The following methods either return job information or operate on jobs:
+
+```jobs, err := client.GetJobs(<option>,<option>,...)```
+
+Returns all jobs, or some subset based on job status, when adding OptJobState(...)
+as an option.
+
+```job,err := client.GetJobWithId(<string>)```
+
+Returns a job, or an ErrNotFound error if no job was found.
+
+## Tasks and Task Reports
+
+The following methods either return task information or operate on tasks:
+
+TODO
 
 ## Appendix: Port forwarding
 
-To port forward API to a location outside:
+If you want to access a Deadline repository which is in a secure environment
+accessible using SSH, use the following command to forward port 8082 to your
+localhost, for example:
 
-```go
-ssh -i ~/.ssh/ansible.pem -L 8082:localhost:8082  ansible@linux-a.vfx.coop
+```bash
+[bash] ssh -L 8082:localhost:8082 <remote server>
 ```
 
 ## Appendix: Jobs JSON Format

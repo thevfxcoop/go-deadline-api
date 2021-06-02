@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -30,6 +31,15 @@ func NewLogTransport(w io.Writer, parent http.RoundTripper, verbose bool) http.R
 	this.v = verbose
 	this.RoundTripper = parent
 	return this
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// PUBLIC METHODS
+
+func (this *logtransport) Payload(v interface{}) {
+	if b, err := json.MarshalIndent(v, "", "  "); err == nil {
+		fmt.Fprintln(this.w, "payload:", string(b))
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

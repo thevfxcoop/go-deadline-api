@@ -57,11 +57,11 @@ func (this *Client) GetTaskIdsForJobId(id string) ([]uint, error) {
 	}
 }
 
-// GetTasksForJobId returns all tasks for a job id
-func (this *Client) GetTasksForJobId(id string) ([]*Task, error) {
+// GetTasksForJobId returns all tasks for a job
+func (this *Client) GetTasksForJob(job string) ([]*Task, error) {
 	var tasks taskList
 	payload := NewGetPayload(ContentTypeJson)
-	if err := this.Do(payload, &tasks, OptPath("api/tasks"), optJobId(id)); err != nil {
+	if err := this.Do(payload, &tasks, OptPath("api/tasks"), optJobId(job)); err != nil {
 		return nil, err
 	}
 
