@@ -92,3 +92,69 @@ func (this *Client) RequeueTasksWithId(id string, tasks ...uint) error {
 	// Return success
 	return nil
 }
+
+// CompleteTasksWithId completes the Tasks that correspond to the Task IDs provided
+// If no Task IDs are provided, all tasks will be completed
+func (this *Client) CompleteTasksWithId(id string, tasks ...uint) error {
+	payload := NewTasksCommandPayload(id, "complete", tasks)
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
+		return err
+	}
+	// Return success
+	return nil
+}
+
+// SuspendTasksWithId suspends the Tasks that correspond to the Task IDs provided
+// If no Task IDs are provided, all tasks will be suspended
+func (this *Client) SuspendTasksWithId(id string, tasks ...uint) error {
+	payload := NewTasksCommandPayload(id, "suspend", tasks)
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
+		return err
+	}
+	// Return success
+	return nil
+}
+
+// FailTasksWithId sets failed state for the Tasks that correspond to the
+// Task IDs provided. If no Task IDs are provided, all tasks will be failed
+func (this *Client) FailTasksWithId(id string, tasks ...uint) error {
+	payload := NewTasksCommandPayload(id, "fail", tasks)
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
+		return err
+	}
+	// Return success
+	return nil
+}
+
+// ResumeFailedTasksWithId resumes failed tasks that correspond to the
+// Task IDs provided. If no Task IDs are provided, all failed tasks will be resumed
+func (this *Client) ResumeFailedTasksWithId(id string, tasks ...uint) error {
+	payload := NewTasksCommandPayload(id, "resumefailed", tasks)
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
+		return err
+	}
+	// Return success
+	return nil
+}
+
+// PendTasksWithId sets pending state for tasks that correspond to the
+// Task IDs provided. If no Task IDs are provided, all tasks will be set to pending
+func (this *Client) PendTasksWithId(id string, tasks ...uint) error {
+	payload := NewTasksCommandPayload(id, "pend", tasks)
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
+		return err
+	}
+	// Return success
+	return nil
+}
+
+// ReleasePendingTasksWithId releases pending tasks that correspond to the
+// Task IDs provided. If no Task IDs are provided, all pending tasks will be resumed
+func (this *Client) ReleasePendingTasksWithId(id string, tasks ...uint) error {
+	payload := NewTasksCommandPayload(id, "releasepending", tasks)
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
+		return err
+	}
+	// Return success
+	return nil
+}
