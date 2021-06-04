@@ -1,6 +1,6 @@
 # go-deadline-api
 
-Deadline API. Please see outline of the REST API [here](https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/index-rest-api.html). There is a lack of informaton on the schema, but it may just come straight out of MongoDB, which is still to be determined.
+Deadline API for [AWS Thinkbox Deadline](https://www.awsthinkbox.com/deadline). Please see outline of the REST API [here](https://docs.thinkboxsoftware.com/products/deadline/10.1/1_User%20Manual/manual/index-rest-api.html). There is a lack of informaton on the schema, but it may just come straight out of MongoDB, which is still to be determined.
 
 The pre-requisites for this api are:
 
