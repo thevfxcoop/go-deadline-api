@@ -51,25 +51,6 @@ in `pkg/schema` for jobs, tasks, and so forth. The schema documentation is:
   * [User & UserGroup](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/user.go)
   * [Pulse](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/pulse.go)
 
-## Jobs and Job Reports
-
-The following methods either return job information or operate on jobs:
-
-```jobs, err := client.GetJobs(<option>,<option>,...)```
-
-Returns all jobs, or some subset based on job status, when adding OptJobState(...)
-as an option.
-
-```job,err := client.GetJobWithId(<string>)```
-
-Returns a job, or an ErrNotFound error if no job was found.
-
-## Tasks and Task Reports
-
-The following methods either return task information or operate on tasks:
-
-TODO
-
 ## Command-Line Tool
 
 There is a command-line tool to demonstrate some of the features of the API. In order to
