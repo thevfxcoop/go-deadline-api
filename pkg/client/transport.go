@@ -56,15 +56,17 @@ func (this *logtransport) RoundTrip(req *http.Request) (*http.Response, error) {
 		fmt.Fprintln(this.w, "  => Error:", err)
 	} else {
 		fmt.Fprintln(this.w, "  =>", resp.Status)
-	}
-	// If verbose is switched on, read the body
-	if this.v {
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err == nil {
-			fmt.Fprintln(this.w, "    ", string(body))
+
+		// If verbose is switched on, read the body
+		if this.v && resp.Body != nil {
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err == nil {
+				fmt.Fprintln(this.w, "    ", string(body))
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewReader(body))
 		}
-		resp.Body = ioutil.NopCloser(bytes.NewReader(body))
 	}
+
 	return resp, err
 }

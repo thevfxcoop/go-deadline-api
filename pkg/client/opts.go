@@ -217,3 +217,13 @@ func optData(value string) RequestOpt {
 		return nil
 	}
 }
+
+// optDirectory for GetRepositoryXX
+func optDirectory(value string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Directory", value)
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}

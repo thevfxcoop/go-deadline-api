@@ -37,6 +37,7 @@ func Run(args []string, client *client.Client) error {
 		NewPools(client),
 		NewUsers(client),
 		NewPulse(client),
+		NewRepository(client),
 	}
 
 	// Cycle through commands and run first which matches
