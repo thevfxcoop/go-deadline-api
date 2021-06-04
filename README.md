@@ -7,6 +7,8 @@ The pre-requisites for this api are:
  * A working Deadline Web Service
  * Any recent version of go
 
+ You can view the API reference for this module here: https://pkg.go.dev/github.com/thevfxcoop/go-deadline-api
+ 
 ## Getting Started
 
 To use this API in your own code, import it and create a client:
@@ -40,10 +42,13 @@ The native deadline schema is somewhat undocumented, so the schema for the
 webservice is translated into a documented schema and available
 in `pkg/schema` for jobs, tasks, and so forth. The schema documentation is:
 
-  * Jobs
-  * Job Reports
-  * Tasks
-  * Task Reports
+  * [Job](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/job.go)
+  * [JobReport](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/jobreport.go)
+  * [Task]
+  * [TaskReport]
+  * [Worker](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/worker.go)
+  * [WorkerReport](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/workerreport.go)
+  * [User & UserGroup](https://github.com/thevfxcoop/go-deadline-api/blob/main/pkg/schema/user.go)
 
 ## Jobs and Job Reports
 

@@ -90,10 +90,6 @@ const (
 	JobScheduledTypeDaily JobScheduledType = 2
 )
 
-var (
-	decoder = NewDecoder("deadline")
-)
-
 ///////////////////////////////////////////////////////////////////////////////
 // LIFECYCLE
 

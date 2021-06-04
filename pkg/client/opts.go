@@ -109,10 +109,16 @@ func optJobId(value string) RequestOpt {
 }
 
 // optTaskId for GetTaskWithId request returns a single task
-func optTaskId(value uint) RequestOpt {
+func optTaskId(values ...uint) RequestOpt {
 	return func(r *http.Request) error {
 		params := r.URL.Query()
-		params.Set("TaskID", fmt.Sprint(value))
+		if len(values) > 0 {
+			tasks := make([]string, 0, len(values))
+			for _, v := range values {
+				tasks = append(tasks, fmt.Sprint(v))
+			}
+			params.Set("TaskID", strings.Join(tasks, ","))
+		}
 		r.URL.RawQuery = params.Encode()
 		return nil
 	}

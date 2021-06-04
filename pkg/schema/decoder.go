@@ -15,6 +15,7 @@ import (
 
 type Decoder struct {
 	tag    string
+	debug  bool
 	fields map[reflect.Type]map[string]reflect.StructField
 	hooks  map[reflect.Type]HookFunc
 }
@@ -24,9 +25,10 @@ type HookFunc func(path string, in, out reflect.Value) error
 ///////////////////////////////////////////////////////////////////////////////
 // LIFECYCLE
 
-func NewDecoder(tag string) *Decoder {
+func NewDecoder(tag string, debug bool) *Decoder {
 	this := new(Decoder)
 	this.tag = tag
+	this.debug = debug
 	this.fields = make(map[reflect.Type]map[string]reflect.StructField)
 	this.hooks = map[reflect.Type]HookFunc{
 		reflect.TypeOf(""):               this.setString,
@@ -72,8 +74,8 @@ func (this *Decoder) decode(root string, in map[string]interface{}, out reflect.
 				if err := this.set(path, reflect.ValueOf(v), out.Elem().FieldByIndex(field.Index)); err != nil {
 					return err
 				}
-			} else {
-				fmt.Printf("%q => unused: %v\n", path, v)
+			} else if this.debug {
+				fmt.Printf("  %q => unused: %v\n", path, v)
 			}
 		}
 	}

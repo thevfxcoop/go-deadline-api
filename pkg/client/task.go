@@ -1,129 +1,94 @@
 package client
 
-import "time"
+import (
+	schema "github.com/thevfxcoop/go-deadline-api/pkg/schema"
+)
 
 ///////////////////////////////////////////////////////////////////////////////
 // SCHEMA
 
-type Task struct {
-	JobId         string
-	TaskId        uint
-	Frames        string
-	Slave         string
-	Status        TaskStatus `json:"Stat"`
-	Progress      string     `json:"Prog"`
-	Errors        uint       `json:"Errs"`
-	SubmittedDate time.Time  `json:"StartDate"`
-	StartDate     time.Time  `json:"StartRen"`
-	CompletedDate time.Time  `json:"Comp"`
-	PreTask       bool
-	PostTask      bool
-}
-
-type TaskStatus uint
-
 type taskList struct {
 	JobID    string `json:"ID"`
-	PreTask  *Task
-	PostTask *Task
-	Tasks    []*Task
+	PreTask  map[string]interface{}
+	PostTask map[string]interface{}
+	Tasks    []map[string]interface{}
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// GLOBALS
-
-const (
-	TaskStatusNone      TaskStatus = 0
-	TaskStatusUnknown   TaskStatus = 1
-	TaskStatusQueued    TaskStatus = 2
-	TaskStatusSuspended TaskStatus = 3
-	TaskStatusRendering TaskStatus = 4
-	TaskStatusCompleted TaskStatus = 5
-	TaskStatusFailed    TaskStatus = 6
-	TaskStatusPending   TaskStatus = 8
-)
 
 ///////////////////////////////////////////////////////////////////////////////
 // METHODS
 
-// GetTaskIdsForJobId returns task id's for a job id
-func (this *Client) GetTaskIdsForJobId(id string) ([]uint, error) {
+// GetTaskIdsForJob returns task id's for a job
+func (this *Client) GetTaskIdsForJob(job string) ([]uint, error) {
 	var tasks []uint
 	payload := NewGetPayload(ContentTypeJson)
-	if err := this.Do(payload, &tasks, OptPath("api/tasks"), optJobId(id), optIdOnly(true)); err != nil {
+	if err := this.Do(payload, &tasks, OptPath("api/tasks"), optJobId(job), optIdOnly(true)); err != nil {
 		return nil, err
 	} else {
 		return tasks, nil
 	}
 }
 
-// GetTasksForJobId returns all tasks for a job
-func (this *Client) GetTasksForJob(job string) ([]*Task, error) {
-	var tasks taskList
+// GetTasksForJob returns all tasks for a job
+func (this *Client) GetTasksForJob(job string) ([]*schema.Task, error) {
+	var obj taskList
 	payload := NewGetPayload(ContentTypeJson)
-	if err := this.Do(payload, &tasks, OptPath("api/tasks"), optJobId(job)); err != nil {
+	if err := this.Do(payload, &obj, OptPath("api/tasks"), optJobId(job)); err != nil {
 		return nil, err
 	}
 
-	// Prepend the pretask and append the posttask
-	if tasks.PreTask != nil {
-		tasks.PreTask.PreTask = true
-		tasks.Tasks = append([]*Task{tasks.PreTask}, tasks.Tasks...)
-	}
-	if tasks.PostTask != nil {
-		tasks.PostTask.PostTask = true
-		tasks.Tasks = append(tasks.Tasks, tasks.PostTask)
+	result := make([]*schema.Task, 0, len(obj.Tasks))
+
+	// Prepend the pretask
+	if obj.PreTask != nil {
+		if task, err := schema.NewTask(obj.PreTask); err != nil {
+			return nil, err
+		} else {
+			task.PreTask = true
+			result = append(result, task)
+		}
 	}
 
-	// Return tasks
-	return tasks.Tasks, nil
+	// Add tasks
+	for _, obj := range obj.Tasks {
+		if task, err := schema.NewTask(obj); err != nil {
+			return nil, err
+		} else {
+			result = append(result, task)
+		}
+	}
+
+	// Append the posttask
+	if obj.PostTask != nil {
+		if task, err := schema.NewTask(obj.PostTask); err != nil {
+			return nil, err
+		} else {
+			task.PostTask = true
+			result = append(result, task)
+		}
+	}
+
+	// Return success
+	return result, nil
 }
 
 // GetTaskWithId returns a task for a job id
-func (this *Client) GetTaskWithId(id string, task uint) (*Task, error) {
-	var obj Task
+func (this *Client) GetTaskWithId(job string, task uint) (*schema.Task, error) {
+	var obj map[string]interface{}
 	payload := NewGetPayload(ContentTypeJson)
-	if err := this.Do(payload, &obj, OptPath("api/tasks"), optJobId(id), optTaskId(task)); err != nil {
+	if err := this.Do(payload, &obj, OptPath("api/tasks"), optJobId(job), optTaskId(task)); err != nil {
 		return nil, err
 	} else {
-		return &obj, nil
+		return schema.NewTask(obj)
 	}
 }
 
 // RequeueTasksWithId requeues the Tasks that correspond to the Task IDs provided
-// for the Job that corresponds to the Job ID provided. If no Task IDs are provided,
-// all Job tasks will be requeued
+// If no Task IDs are provided, all tasks will be requeued
 func (this *Client) RequeueTasksWithId(id string, tasks ...uint) error {
 	payload := NewTasksCommandPayload(id, "requeue", tasks)
-	if err := this.Do(payload, nil, OptPath("api/tasks"), optJobId(id)); err != nil {
+	if err := this.Do(payload, nil, OptPath("api/tasks")); err != nil {
 		return err
 	}
 	// Return success
 	return nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// STRINGIFY
-
-func (v TaskStatus) String() string {
-	switch v {
-	case TaskStatusNone:
-		return "TaskStatusNone"
-	case TaskStatusUnknown:
-		return "TaskStatusUnknown"
-	case TaskStatusQueued:
-		return "TaskStatusQueued"
-	case TaskStatusSuspended:
-		return "TaskStatusSuspended"
-	case TaskStatusRendering:
-		return "TaskStatusRendering"
-	case TaskStatusCompleted:
-		return "TaskStatusCompleted"
-	case TaskStatusFailed:
-		return "TaskStatusFailed"
-	case TaskStatusPending:
-		return "TaskStatusPending"
-	default:
-		return "[?? Invalid TaskStatus value]"
-	}
 }

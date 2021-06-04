@@ -23,7 +23,7 @@ type JobReport struct {
 	Date           time.Time     `deadline:"Date" json:"date,omitempty"`
 	DateStarted    time.Time     `deadline:"TaskStartTime" json:"date_start,omitempty"`
 	TaskTime       time.Duration `deadline:"TaskTime" json:"duration_task,omitempty"`
-	Slave          string        `deadline:"Slave" json:"slave,omitempty"`
+	Worker         string        `deadline:"Slave" json:"slave,omitempty"`
 	Data           string        `deadline:"Title" json:"data,omitempty"`
 	MemMaxBytes    uint          `deadline:"PeakRam" json:"mem_max_bytes,omitempty"`
 	MemMeanBytes   uint          `deadline:"AverageRam" json:"mem_mean_bytes,omitempty"`

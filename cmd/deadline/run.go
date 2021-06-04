@@ -30,9 +30,10 @@ func Run(args []string, client *client.Client) error {
 	commands := []Command{
 		NewJobs(client),
 		NewJobReports(client),
+		NewTasks(client),
+		NewWorkers(client),
 		NewGroups(client),
 		NewPools(client),
-		NewWorkers(client),
 		NewUsers(client),
 	}
 
