@@ -164,12 +164,44 @@ func optNameOnly() RequestOpt {
 	}
 }
 
+// optInfo for GetPulseNames
+func optInfo() RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Info", "true")
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optSettings for GetPulseSettings
+func optSettings() RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		params.Set("Settings", "true")
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
 // optName for GetWorkerXX
 func optName(value []string) RequestOpt {
 	return func(r *http.Request) error {
 		params := r.URL.Query()
 		if len(value) > 0 {
 			params.Set("Name", strings.Join(value, ","))
+		}
+		r.URL.RawQuery = params.Encode()
+		return nil
+	}
+}
+
+// optNames for GetPulseInfo
+func optNames(value []string) RequestOpt {
+	return func(r *http.Request) error {
+		params := r.URL.Query()
+		if len(value) > 0 {
+			params.Set("Names", strings.Join(value, ","))
 		}
 		r.URL.RawQuery = params.Encode()
 		return nil

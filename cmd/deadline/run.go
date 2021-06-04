@@ -14,13 +14,14 @@ import (
 // TYPES
 
 type Command interface {
-	Matches([]string) url.Values
-	Run(url.Values) error
+	Matches([]string) (fn, url.Values)
 }
 
 type command struct {
 	*client.Client
 }
+
+type fn func(url.Values) error
 
 ///////////////////////////////////////////////////////////////////////////////
 // METHODS
@@ -35,15 +36,17 @@ func Run(args []string, client *client.Client) error {
 		NewGroups(client),
 		NewPools(client),
 		NewUsers(client),
+		NewPulse(client),
 	}
 
-	// Cycle through commands
+	// Cycle through commands and run first which matches
 	for _, cmd := range commands {
-		if params := cmd.Matches(args); params != nil {
-			return cmd.Run(params)
+		if fn, params := cmd.Matches(args); fn != nil && params != nil {
+			return fn(params)
 		}
 	}
 
+	// No command found
 	return deadline.ErrNotFound.With(args[0])
 }
 

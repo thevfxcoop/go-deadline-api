@@ -18,23 +18,21 @@ type Jobs struct {
 // LIFECYCLE
 
 func NewJobs(client *client.Client) Command {
-	this := new(Jobs)
-	this.Client = client
-	return this
+	return &Jobs{command{Client: client}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // METHODS
 
-func (this *Jobs) Matches(args []string) url.Values {
+func (this *Jobs) Matches(args []string) (fn, url.Values) {
 	params := url.Values{}
 	if args[0] == "jobs" && len(args) == 1 {
-		return params
+		return this.RunJobs, params
 	}
-	return nil
+	return nil, nil
 }
 
-func (this *Jobs) Run(params url.Values) error {
+func (this *Jobs) RunJobs(params url.Values) error {
 	if jobs, err := this.Client.GetJobs(); err != nil {
 		return err
 	} else {

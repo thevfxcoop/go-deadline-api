@@ -13,86 +13,74 @@ import (
 
 type Tasks struct {
 	command
-	fn func(url.Values) error
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // LIFECYCLE
 
 func NewTasks(client *client.Client) Command {
-	this := new(Tasks)
-	this.Client = client
-	return this
+	return &Tasks{command{Client: client}}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // METHODS
 
-func (this *Tasks) Matches(args []string) url.Values {
+func (this *Tasks) Matches(args []string) (fn, url.Values) {
 	params := url.Values{}
 	if args[0] == "tasks" && len(args) == 2 {
 		params.Set("job", args[1])
-		this.fn = this.RunTaskId
-		return params
+		return this.RunTaskId, params
 	}
 	if args[0] == "taskinfo" && len(args) == 2 {
 		params.Set("job", args[1])
-		this.fn = this.RunTaskInfo
-		return params
+		return this.RunTaskInfo, params
 	}
 	if args[0] == "requeue" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunRequeueTasks
-		return params
+		return this.RunRequeueTasks, params
 	}
 	if args[0] == "complete" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunCompleteTasks
-		return params
+		return this.RunCompleteTasks, params
 	}
 	if args[0] == "suspend" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunSuspendTasks
-		return params
+		return this.RunSuspendTasks, params
 	}
 	if args[0] == "fail" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunFailTasks
-		return params
+		return this.RunFailTasks, params
 	}
 	if args[0] == "resume" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunResumeTasks
-		return params
+		return this.RunResumeTasks, params
 	}
 	if args[0] == "pend" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunPendTasks
-		return params
+		return this.RunPendTasks, params
 	}
 	if args[0] == "release" && len(args) > 1 {
 		params.Set("job", args[1])
 		params["tasks"] = args[2:]
-		this.fn = this.RunReleaseTasks
-		return params
+		return this.RunReleaseTasks, params
 	}
 	if args[0] == "taskreports" && len(args) == 3 {
 		params.Set("job", args[1])
 		params.Set("task", args[2])
-		this.fn = this.RunTaskReports
-		return params
+		return this.RunTaskReports, params
 	}
-	return nil
-}
-
-func (this *Tasks) Run(params url.Values) error {
-	return this.fn(params)
+	if args[0] == "taskreportcontents" && len(args) == 3 {
+		params.Set("job", args[1])
+		params.Set("task", args[2])
+		return this.RunTaskReports, params
+	}
+	return nil, nil
 }
 
 func (this *Tasks) RunTaskId(params url.Values) error {
@@ -199,6 +187,16 @@ func (this *Tasks) RunTaskReports(params url.Values) error {
 	if task, err := strconv.ParseUint(params.Get("task"), 0, 32); err != nil {
 		return err
 	} else if reports, err := this.GetTaskReports(params.Get("job"), uint(task)); err != nil {
+		return err
+	} else {
+		return this.output(reports)
+	}
+}
+
+func (this *Tasks) RunTaskReportContentas(params url.Values) error {
+	if task, err := strconv.ParseUint(params.Get("task"), 0, 32); err != nil {
+		return err
+	} else if reports, err := this.GetTaskReportContents(params.Get("job"), uint(task)); err != nil {
 		return err
 	} else {
 		return this.output(reports)
