@@ -1,25 +1,31 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/url"
 
+	// Modules
 	"github.com/thevfxcoop/go-deadline-api/pkg/client"
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// TYPES
 
 type Pools struct {
 	command
 	run string
 }
 
-func NewPools(client *client.Client, log *log.Logger) Command {
+///////////////////////////////////////////////////////////////////////////////
+// LIFECYCLE
+
+func NewPools(client *client.Client) Command {
 	this := new(Pools)
 	this.Client = client
-	this.Logger = log
 	return this
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// METHODS
 
 func (this *Pools) Matches(args []string) url.Values {
 	params := url.Values{}
@@ -47,38 +53,30 @@ func (this *Pools) Run(params url.Values) error {
 	case "pools":
 		if pools, err := this.GetPools(); err != nil {
 			return err
-		} else if data, err := json.Marshal(pools); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(pools)
 		}
 	case "poolworkers":
 		if workers, err := this.GetWorkersForPool(params["pools"]...); err != nil {
 			return err
-		} else if data, err := json.Marshal(workers); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	case "addpool":
 		if err := this.AddPools(params["pools"]...); err != nil {
 			return err
 		} else if pools, err := this.GetPools(); err != nil {
 			return err
-		} else if data, err := json.Marshal(pools); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(pools)
 		}
 	case "deletepool":
 		if err := this.DeletePools(params["pools"]...); err != nil {
 			return err
 		} else if pools, err := this.GetPools(); err != nil {
 			return err
-		} else if data, err := json.Marshal(pools); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(pools)
 		}
 	}
 

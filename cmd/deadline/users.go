@@ -1,25 +1,31 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/url"
 
+	// Modules
 	"github.com/thevfxcoop/go-deadline-api/pkg/client"
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// TYPES
 
 type Users struct {
 	command
 	run string
 }
 
-func NewUsers(client *client.Client, log *log.Logger) Command {
+///////////////////////////////////////////////////////////////////////////////
+// LIFECYCLE
+
+func NewUsers(client *client.Client) Command {
 	this := new(Users)
 	this.Client = client
-	this.Logger = log
 	return this
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// METHODS
 
 func (this *Users) Matches(args []string) url.Values {
 	params := url.Values{}
@@ -41,18 +47,14 @@ func (this *Users) Run(params url.Values) error {
 	case "users":
 		if users, err := this.GetUserNames(); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(users, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(users)
 		}
 	case "userinfo":
 		if users, err := this.GetUserInfo(params["user"]...); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(users, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(users)
 		}
 	}
 	// Return success

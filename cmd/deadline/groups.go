@@ -1,25 +1,31 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/url"
 
+	// Modules
 	"github.com/thevfxcoop/go-deadline-api/pkg/client"
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// TYPES
 
 type Groups struct {
 	command
 	run string
 }
 
-func NewGroups(client *client.Client, log *log.Logger) Command {
+///////////////////////////////////////////////////////////////////////////////
+// LIFECYCLE
+
+func NewGroups(client *client.Client) Command {
 	this := new(Groups)
 	this.Client = client
-	this.Logger = log
 	return this
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// METHODS
 
 func (this *Groups) Matches(args []string) url.Values {
 	params := url.Values{}
@@ -61,68 +67,54 @@ func (this *Groups) Run(params url.Values) error {
 	case "groups":
 		if groups, err := this.GetGroups(); err != nil {
 			return err
-		} else if data, err := json.Marshal(groups); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(groups)
 		}
 	case "groupworkers":
 		if workers, err := this.GetWorkersForGroup(params["groups"]...); err != nil {
 			return err
-		} else if data, err := json.Marshal(workers); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	case "addgroup":
 		if err := this.AddGroups(params["groups"]...); err != nil {
 			return err
 		} else if groups, err := this.GetGroups(); err != nil {
 			return err
-		} else if data, err := json.Marshal(groups); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(groups)
 		}
 	case "deletegroup":
 		if err := this.DeleteGroups(params["groups"]...); err != nil {
 			return err
 		} else if groups, err := this.GetGroups(); err != nil {
 			return err
-		} else if data, err := json.Marshal(groups); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(groups)
 		}
 	case "setgroups":
 		if err := this.SetGroups(params["groups"]...); err != nil {
 			return err
 		} else if groups, err := this.GetGroups(); err != nil {
 			return err
-		} else if data, err := json.Marshal(groups); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(groups)
 		}
 	case "addgroupworkers":
 		if err := this.AddWorkersToGroup(params.Get("group"), params["workers"]...); err != nil {
 			return err
 		} else if workers, err := this.GetWorkersForGroup(params.Get("group")); err != nil {
 			return err
-		} else if data, err := json.Marshal(workers); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	case "removegroupworkers":
 		if err := this.RemoveWorkersFromGroup(params.Get("group"), params["workers"]...); err != nil {
 			return err
 		} else if workers, err := this.GetWorkersForGroup(params.Get("group")); err != nil {
 			return err
-		} else if data, err := json.Marshal(workers); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	}
 

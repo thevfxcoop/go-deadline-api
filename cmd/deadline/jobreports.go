@@ -1,23 +1,30 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"net/url"
 
+	// Modules
 	"github.com/thevfxcoop/go-deadline-api/pkg/client"
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// TYPES
 
 type JobReports struct {
 	command
 }
 
-func NewJobReports(client *client.Client, log *log.Logger) Command {
+///////////////////////////////////////////////////////////////////////////////
+// LIFECYCLE
+
+func NewJobReports(client *client.Client) Command {
 	this := new(JobReports)
 	this.Client = client
-	this.Logger = log
 	return this
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// METHODS
 
 func (this *JobReports) Matches(args []string) url.Values {
 	params := url.Values{}
@@ -32,9 +39,6 @@ func (this *JobReports) Run(params url.Values) error {
 	if jobs, err := this.GetJobReports(params.Get("id")); err != nil {
 		return err
 	} else {
-		fmt.Println(jobs)
+		return this.output(jobs)
 	}
-
-	// Return success
-	return nil
 }

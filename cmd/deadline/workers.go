@@ -1,25 +1,31 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/url"
 
+	// Modules
 	"github.com/thevfxcoop/go-deadline-api/pkg/client"
 )
+
+///////////////////////////////////////////////////////////////////////////////
+// TYPES
 
 type Workers struct {
 	command
 	run string
 }
 
-func NewWorkers(client *client.Client, log *log.Logger) Command {
+///////////////////////////////////////////////////////////////////////////////
+// LIFECYCLE
+
+func NewWorkers(client *client.Client) Command {
 	this := new(Workers)
 	this.Client = client
-	this.Logger = log
 	return this
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// METHODS
 
 func (this *Workers) Matches(args []string) url.Values {
 	params := url.Values{}
@@ -51,44 +57,34 @@ func (this *Workers) Run(params url.Values) error {
 	case "workers":
 		if workers, err := this.GetWorkerNames(); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(workers, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	case "workerinfo":
 		if workers, err := this.GetWorkerInfo(params["worker"]...); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(workers, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	case "deleteworker":
 		if err := this.DeleteWorkers(params["worker"]...); err != nil {
 			return err
 		} else if workers, err := this.GetWorkerNames(); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(workers, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	case "workerreport":
 		if reports, err := this.GetWorkerReports(params["worker"]...); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(reports, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(reports)
 		}
 	case "workersforjob":
 		if workers, err := this.WorkersForJob(params.Get("job")); err != nil {
 			return err
-		} else if data, err := json.MarshalIndent(workers, "", "  "); err != nil {
-			return err
 		} else {
-			fmt.Println(string(data))
+			return this.output(workers)
 		}
 	}
 
