@@ -51,7 +51,7 @@ func (this *Repository) RunRepository(params url.Values) error {
 	} else {
 		repo.Root = value
 	}
-	/*if value, err := this.GetRepositoryBin(); err != nil {
+	if value, err := this.GetRepositoryBin(); err != nil {
 		return err
 	} else {
 		repo.Bin = value
@@ -61,7 +61,6 @@ func (this *Repository) RunRepository(params url.Values) error {
 	} else {
 		repo.Settings = value
 	}
-	*/
 	if value, err := this.GetRepositoryEvents(); err != nil {
 		return err
 	} else {
