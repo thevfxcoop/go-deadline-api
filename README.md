@@ -67,7 +67,7 @@ include the endpoint URL on the command line with the `-endpoint` flag. For exam
 
 
 ```bash
-[bash] export DEADLINE_ENDPOINT=DEADLINE_ENDPOINT=http://localhost:8082/
+[bash] export DEADLINE_ENDPOINT=http://localhost:8082/
 [bash] build/deadline 
 Deadline Web Service 10.1 [v10.1.15.2 Release (313fe6482)]
 ```
@@ -77,8 +77,7 @@ the deadline repository cannot be found. You can add a `-debug` flag to trace
 traffic to and from your web service:
 
 ```bash
-[bash] export DEADLINE_ENDPOINT=DEADLINE_ENDPOINT=http://localhost:8082/
-[bash] build/deadline -debug jobs
+[bash] build/deadline -endpoint http://localhost:8082/ -debug jobs
 payload: {}
 req: GET http://localhost:8082/
   => 200 OK
